@@ -1,6 +1,6 @@
 {
   "name": "pgmjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library to work with PGM files in Javascript.",
   "main": "pgmjs.js",
   "directories": {

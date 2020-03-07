@@ -1,3 +1,5 @@
+test/*.png
+
 # Logs
 logs
 *.log

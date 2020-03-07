@@ -4,6 +4,19 @@ const PNG = require('pngjs').PNG
 
 const SIGNATURES = {P5: 'P5', P2: 'P2', INVALID: 'invalid'}
 
+function sum(arr) {
+  return arr.reduce((a, b) => a + b, 0)
+}
+
+function average(arr) {
+  return sum(arr) / arr.length
+}
+
+function variance(arr) {
+  const mu = average(arr)
+  return average(arr.map((d) => Math.pow(d - mu, 2)))
+}
+
 function isCharWhitespace(char) {
   return (char >= 0x09 && char <= 0x0D) || char == 0x20
 }
@@ -91,8 +104,22 @@ async function readPgm(filePath) {
   return {signature, width, height, maxval, pixels}
 }
 
-async function writePngFromPgm(pgmData, outPath) {
-  console.log(pgmData)
+async function writePngFromPgm(pgmData, outPath, colorMasks) {
+  if (!colorMasks) {
+    colorMasks = [[1, 1, 1]]
+  }
+
+  // Color mask entires are between 0 and 1, but we want the 3 of them to add
+  // up to 3, so we don't lose brightness. So, we scale the values. At the
+  // same time, we want to make sure we get enough brightness, so we multiply all values
+  // by the variance.
+  // colorMaskSum = sum(colorMask)
+  // colorMaskScalingFactor = 3.0 / colorMaskSum / 2
+  // colorMask = colorMask.map((entry) => entry * colorMaskScalingFactor)
+  // scaledColorMaskVariance = variance(colorMask)
+  // colorMask = colorMask.map((entry) => entry * scaledColorMaskVariance)
+  // console.log(colorMask)
+  // console.log(scaledColorMaskVariance)
 
   let newfile = new PNG({width: pgmData.width, height: pgmData.height})
 
@@ -101,9 +128,19 @@ async function writePngFromPgm(pgmData, outPath) {
       const idx = (newfile.width * y + x)
       const pngIdx = idx << 2
       const pixel = pgmData.pixels[idx] / pgmData.maxval * 255
-      newfile.data[pngIdx] = pixel
-      newfile.data[pngIdx + 1] = pixel
-      newfile.data[pngIdx + 2] = pixel
+
+      colorMaskIndex = Math.floor(Math.min(pixel, 254) / 255 * colorMasks.length)
+      colorMask = colorMasks[colorMaskIndex]
+
+      let rgbPixels = [
+        pixel * colorMask[0],
+        pixel * colorMask[1],
+        pixel * colorMask[2],
+      ]
+      rgbPixels = rgbPixels.map((p) => Math.min(p, 255))
+      newfile.data[pngIdx] = rgbPixels[0]
+      newfile.data[pngIdx + 1] = rgbPixels[1]
+      newfile.data[pngIdx + 2] = rgbPixels[2]
       newfile.data[pngIdx + 3] = 0xff
     }
   }

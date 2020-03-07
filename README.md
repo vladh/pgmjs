@@ -1,6 +1,6 @@
 # pgmjs
 
-![](doc/demo1.png) ![](doc/demo2.png) ![](doc/demo2.png)
+![](doc/demo1.png) ![](doc/demo2.png) ![](doc/demo3.png)
 
 A pure Javascript library to work with PGM files. Supports both plain and raw PGM. Also supports
 adding color filters to your images.

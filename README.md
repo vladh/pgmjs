@@ -28,7 +28,7 @@ A Promise containing an Object with:
 * `maxval`: The maximum gray value
 * `pixels`: An array with the individual pixel values as numbers from `0` to `maxval`, from top left to bottom right, rows first then columns
 
-#### `writePngFromPgm(pgmData, outPath)`
+### `writePngFromPgm(pgmData, outPath)`
 
 For a given PGM file, convers it to PNG and writes that as a file.
 

@@ -1,0 +1,17 @@
+{
+  "name": "pgmjs",
+  "version": "1.0.0",
+  "description": "A library to work with PGM files in Javascript.",
+  "main": "pgmjs.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "author": "Vlad-Stefan Harbuz <vlad@vladh.net>",
+  "license": "ISC",
+  "dependencies": {
+    "pngjs": "^3.4.0"
+  }
+}

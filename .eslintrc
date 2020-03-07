@@ -1,0 +1,10 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "rules": {
+    "comma-dangle": 0,
+    "no-new": 0,
+    "space-before-function-paren": ["error", "never"]
+  }
+}

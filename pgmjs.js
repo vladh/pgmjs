@@ -109,18 +109,6 @@ async function writePngFromPgm(pgmData, outPath, colorMasks) {
     colorMasks = [[1, 1, 1]]
   }
 
-  // Color mask entires are between 0 and 1, but we want the 3 of them to add
-  // up to 3, so we don't lose brightness. So, we scale the values. At the
-  // same time, we want to make sure we get enough brightness, so we multiply all values
-  // by the variance.
-  // colorMaskSum = sum(colorMask)
-  // colorMaskScalingFactor = 3.0 / colorMaskSum / 2
-  // colorMask = colorMask.map((entry) => entry * colorMaskScalingFactor)
-  // scaledColorMaskVariance = variance(colorMask)
-  // colorMask = colorMask.map((entry) => entry * scaledColorMaskVariance)
-  // console.log(colorMask)
-  // console.log(scaledColorMaskVariance)
-
   let newfile = new PNG({width: pgmData.width, height: pgmData.height})
 
   for (let y = 0; y < newfile.height; y++) {

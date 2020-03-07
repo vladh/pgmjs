@@ -4,19 +4,6 @@ const PNG = require('pngjs').PNG
 
 const SIGNATURES = {P5: 'P5', P2: 'P2', INVALID: 'invalid'}
 
-function sum(arr) {
-  return arr.reduce((a, b) => a + b, 0)
-}
-
-function average(arr) {
-  return sum(arr) / arr.length
-}
-
-function variance(arr) {
-  const mu = average(arr)
-  return average(arr.map((d) => Math.pow(d - mu, 2)))
-}
-
 function isCharWhitespace(char) {
   return (char >= 0x09 && char <= 0x0D) || char == 0x20
 }

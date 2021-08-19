@@ -4,8 +4,12 @@ const PNG = require('pngjs').PNG
 
 const SIGNATURES = {P5: 'P5', P2: 'P2', INVALID: 'invalid'}
 
+function isCharNewline(char) {
+  return (char >= 0x09 && char <= 0x0D)
+}
+
 function isCharWhitespace(char) {
-  return (char >= 0x09 && char <= 0x0D) || char == 0x20
+  return isCharNewline(char) || char == 0x20
 }
 
 function getPixelSize(maxval) {
@@ -33,13 +37,36 @@ function isMaxvalValid(maxval) {
 async function readUntilWhitespace(file, fileSize, offset) {
   let currentByte = Buffer.alloc(1)
   let currentData = Buffer.alloc(0)
-  for (let idx = offset; idx < fileSize; idx++) {
+  let idx = offset
+  while (idx < fileSize) {
     await util.promisify(fs.read)(file, currentByte, 0, 1, idx)
+
+    if (currentByte[0] == '#'.charCodeAt(0)) {
+      // If this character is the comment start character #, ignore everything
+      // through the next newline.
+      let haveFoundNewline = false
+      while (true) {
+        idx++
+        await util.promisify(fs.read)(file, currentByte, 0, 1, idx)
+        if (isCharNewline(currentByte[0])) {
+          haveFoundNewline = true
+        }
+        // Wait until we've seen a newline, then consume as many newlines as
+        // we can, then return.
+        if (haveFoundNewline && !isCharNewline(currentByte[0])) {
+          break
+        }
+      }
+    }
     if (isCharWhitespace(currentByte[0]) || idx == fileSize - 1) {
+      // If this character is whitespace, return what we read so far.
       return [Buffer.from(currentData, 'hex').toString(), idx + 1]
     } else {
+      // Otherwise, continue reading.
       currentData = Buffer.concat([currentData, currentByte])
     }
+
+    idx++
   }
 }
 

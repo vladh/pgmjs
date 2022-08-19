@@ -3,19 +3,19 @@ const path = require('path')
 
 const colorMasks = [
   null,
-  [[1,1,1]],
-  [[1,0,0]],
-  [[0,1,0]],
-  [[0,0,1]],
-  [[1,0,1]],
-  [[1,1,0]],
-  [[0,1,1]],
-  [[1,0,0], [0,1,0]],
-  [[0,0,1], [0,1,0], [1,0,0]],
-  [[0,0,1], [1,0,1], [1,0,0], [1,1,0]], // nice one!
-  [[1,1,0], [1,0.5,0], [1,0,0], [1,0,1], [1,1,1]],
-  [[0,0,1], [0,0,1], [1,0,0], [1,0.5,0], [0,1,1], [1,0,1]],
-  [[0.5,0,0.5], [0.7,0,0.7], [1,0,1], [1,0.5,0], [1,0,0]],
+  [[1, 1, 1]],
+  [[1, 0, 0]],
+  [[0, 1, 0]],
+  [[0, 0, 1]],
+  [[1, 0, 1]],
+  [[1, 1, 0]],
+  [[0, 1, 1]],
+  [[1, 0, 0], [0, 1, 0]],
+  [[0, 0, 1], [0, 1, 0], [1, 0, 0]],
+  [[0, 0, 1], [1, 0, 1], [1, 0, 0], [1, 1, 0]], // nice one!
+  [[1, 1, 0], [1, 0.5, 0], [1, 0, 0], [1, 0, 1], [1, 1, 1]],
+  [[0, 0, 1], [0, 0, 1], [1, 0, 0], [1, 0.5, 0], [0, 1, 1], [1, 0, 1]],
+  [[0.5, 0, 0.5], [0.7, 0, 0.7], [1, 0, 1], [1, 0.5, 0], [1, 0, 0]],
 ]
 
 pgmjs.readPgm(path.join(__dirname, 'test_p5.pgm')).then((pgmData) => {
@@ -31,3 +31,11 @@ pgmjs.readPgm(path.join(__dirname, 'test_p2.pgm')).then((pgmData) => {
     pgmjs.writePngFromPgm(pgmData, path.join(__dirname, 'test_p2_' + idx + '.png'), colorMask)
   })
 })
+
+
+// to test time  pgm parsing consume.
+const parsinBegin = Date.now();
+pgmjs.readPgm(path.join(__dirname, 'test_large.pgm')).then((pgmData) => {
+  console.log('parsing this large pgm spent: ', Date.now() - parsinBegin);
+})
+

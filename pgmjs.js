@@ -2,7 +2,7 @@ const fs = require('fs')
 const util = require('util')
 const PNG = require('pngjs').PNG
 
-const SIGNATURES = {P5: 'P5', P2: 'P2', INVALID: 'invalid'}
+const SIGNATURES = { P5: 'P5', P2: 'P2', INVALID: 'invalid' }
 
 function isCharNewline(char) {
   return (char >= 0x09 && char <= 0x0D)
@@ -74,10 +74,24 @@ async function readPixels(file, fileSize, offset, pixelSize, signature) {
   let pixels = []
 
   if (signature == SIGNATURES.P5) {
-    let currentByte = Buffer.alloc(pixelSize)
-    for (let idx = offset; idx < fileSize; idx++) {
-      await util.promisify(fs.read)(file, currentByte, 0, pixelSize, idx)
-      pixels.push(Buffer.from(currentByte, 'hex').readUIntBE(0, pixelSize))
+
+    // it is used to improve the performance of reading of IO.
+    const ALLOCATED_SIZE = 1024 * 4 * pixelSize
+    let currentByte = Buffer.alloc(ALLOCATED_SIZE)
+
+    for (let idx = offset; idx < fileSize;) {
+      // await util.promisify(fs.read)(file, currentByte, 0, pixelSize, idx)
+      // pixels.push(Buffer.from(currentByte, 'hex').readUIntBE(0, pixelSize))
+
+      const largeReadingSize =
+        fileSize - idx > ALLOCATED_SIZE ? ALLOCATED_SIZE : fileSize - idx;
+
+      await util.promisify(fs.read)(file, currentByte, 0, largeReadingSize, idx)
+      for (let i = 0; i < largeReadingSize; i = i + pixelSize) {
+        pixels.push(currentByte.readUIntBE(i, pixelSize));
+        // pixels.push(Buffer.from(currentByte, 'hex').readUIntBE(i, pixelSize))
+      }
+      idx = idx + largeReadingSize / pixelSize;
     }
   } else if (signature == SIGNATURES.P2) {
     let idx = offset
@@ -115,7 +129,7 @@ async function readPgm(filePath) {
   const pixelSize = getPixelSize(maxval)
   const pixels = await readPixels(file, fileSize, maxvalEnd, pixelSize, signature)
 
-  return {signature, width, height, maxval, pixels}
+  return { signature, width, height, maxval, pixels }
 }
 
 async function writePngFromPgm(pgmData, outPath, colorMasks) {
@@ -123,7 +137,7 @@ async function writePngFromPgm(pgmData, outPath, colorMasks) {
     colorMasks = [[1, 1, 1]]
   }
 
-  let newfile = new PNG({width: pgmData.width, height: pgmData.height})
+  let newfile = new PNG({ width: pgmData.width, height: pgmData.height })
 
   for (let y = 0; y < newfile.height; y++) {
     for (let x = 0; x < newfile.width; x++) {
